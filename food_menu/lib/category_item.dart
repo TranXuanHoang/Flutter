@@ -11,13 +11,24 @@ class CategoryItem extends StatelessWidget {
 
   void selectCategory(BuildContext context) {
     // Navigate to the CategoryMealsScreen
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) {
-        return CategoryMealsScreen(
-          id: id,
-          title: title,
-        );
-      }),
+
+    // Method 1 - Using Nagivator's push
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(builder: (_) {
+    //     return CategoryMealsScreen(
+    //       id: id,
+    //       title: title,
+    //     );
+    //   }),
+    // );
+
+    // Method 2 - Using named route
+    Navigator.of(context).pushNamed(
+      CategoryMealsScreen.routeName,
+      arguments: {
+        'id': id,
+        'title': title,
+      },
     );
   }
 
