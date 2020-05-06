@@ -90,6 +90,17 @@ class MealDetailScreen extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.delete,
+        ),
+        onPressed: () {
+          // Delete the meal by poping out the meal_detail_screen,
+          // and passing the to-be-deleted mealId to the category_meals_screen
+          // where the meal will actually be deleted.
+          Navigator.of(context).pop(mealId);
+        },
+      ),
     );
   }
 }
