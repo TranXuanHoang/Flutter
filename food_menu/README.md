@@ -1,16 +1,18 @@
 # food_menu
 
-A new Flutter project.
+A simple mobile application that has the following functionalities:
 
-## Getting Started
+* Show a list of food categories (also called meal categories, i.e. Summer, Germany, Italian, ...)
+* Show a list of meals for each food category
+* Show meal details (picture, ingredients, cooking steps)
+* User can mark a meal as favorite
+* Can setup filters to specify what type of meals for which want to search
 
-This project is a starting point for a Flutter application.
+## Screen snapshots
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+|1 Categories |2 Drawer |3 Filters |
+|---------|---------|---------|
+|![Categories](./snapshots/1-HomeScreen-Categories.PNG)|![Drawer](./snapshots/2-HomeScreen-DrawerMenu.PNG)|![Filters](./snapshots/3-FiltersSettingScreen.PNG)|
+|4 Meals |5 Meal Detail |6 Favorites |
+|![Meals](./snapshots/4-MealsByCategoryScreen.PNG)|![Meal Detail](./snapshots/5-MealDetailScreen.PNG)|![Favorites](./snapshots/6-FavoriteMealsScreen.PNG)|
