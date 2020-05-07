@@ -4,6 +4,11 @@ import 'package:food_menu/dummy_data.dart';
 class MealDetailScreen extends StatelessWidget {
   static const routeName = '/meal-detail';
 
+  final Function toggleFavorite;
+  final Function isFavorite;
+
+  MealDetailScreen(this.toggleFavorite, this.isFavorite);
+
   Widget buildSectionHeader(BuildContext context, String text) {
     return Container(
       margin: EdgeInsets.symmetric(
@@ -43,11 +48,42 @@ class MealDetailScreen extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Container(
-              height: 300,
+              // height: 300,
               width: double.infinity,
-              child: Image.network(
-                selectedMeal.imageUrl,
-                fit: BoxFit.cover,
+              child: Stack(
+                children: <Widget>[
+                  Image.network(
+                    selectedMeal.imageUrl,
+                    fit: BoxFit.cover,
+                  ),
+                  Positioned(
+                    top: 15,
+                    right: 15,
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).accentColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 10,
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          isFavorite(mealId) ? Icons.star : Icons.star_border,
+                          size: 30,
+                        ),
+                        onPressed: () => toggleFavorite(mealId),
+                        // color: Colors.black54,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
             buildSectionHeader(context, 'Ingredients'),
