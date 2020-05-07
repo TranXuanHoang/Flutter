@@ -128,7 +128,14 @@ class MealItem extends StatelessWidget {
                         SizedBox(
                           width: 6,
                         ),
-                        Text("$duration mins"),
+                        Flexible(
+                          child: Text(
+                            "$duration mins",
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -140,7 +147,14 @@ class MealItem extends StatelessWidget {
                         SizedBox(
                           width: 6,
                         ),
-                        Text(complexityText),
+                        Flexible(
+                          child: Text(
+                            complexityText,
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -149,7 +163,14 @@ class MealItem extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
                         Icon(Icons.attach_money),
-                        Text(affordabilityText),
+                        Flexible(
+                          child: Text(
+                            affordabilityText,
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
+                        ),
                       ],
                     ),
                   ),
