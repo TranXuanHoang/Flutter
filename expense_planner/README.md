@@ -9,4 +9,4 @@ a chart depicting how much money was used in these transactions during each day 
 |![Home Page (Portrait)](./snapshots/Home1-portrait.PNG)| ![Home Page (Landscape)](./snapshots/Home1-landscape.PNG)|
 |![Home Page (Portrait)](./snapshots/AddNewTransaction-portrait.PNG)| ![Home Page (Landscape)](./snapshots/AddNewTransaction-landscape.PNG)|
 |![Home Page (Portrait)](./snapshots/AddNewTransaction-SelectDate-portrait.PNG)| ![Home Page (Landscape)](./snapshots/AddNewTransaction-SelectDate-landscape.PNG)|
-|![Home Page (Portrait)](./snapshots/TransactionList-portrait.PNG)| ![Home Page (Landscape)](./snapshots/TransactionList-landscape.PNG)<br>![Home Page (Landscape)](./snapshots/TransactionList-landscape.PNG)|
+|![Home Page (Portrait)](./snapshots/TransactionList-portrait.PNG)| ![Home Page (Landscape)](./snapshots/TransactionChart-landscape.PNG)<br>![Home Page (Landscape)](./snapshots/TransactionList-landscape.PNG)|
