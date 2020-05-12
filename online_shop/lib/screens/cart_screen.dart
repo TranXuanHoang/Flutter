@@ -21,7 +21,6 @@ class CartScreen extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(8),
               child: Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   Text(
                     'Total',
@@ -52,7 +51,10 @@ class CartScreen extends StatelessWidget {
             child: ListView.builder(
               itemBuilder: (context, index) {
                 var cartItemModel = cart.items.values.elementAt(index);
-                return CartItem(cartItemModel);
+                return CartItem(
+                  cartItemModel: cartItemModel,
+                  productId: cart.items.keys.elementAt(index),
+                );
               },
               itemCount: cart.items.length,
             ),
