@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/providers/product.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/product.dart';
+import '../providers/products.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
@@ -44,7 +47,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() {
         _autovalidateImageUrl = true;
         // Inside here we don't write any logic, but the setState method
-        // will tiggers the rebuild of this screen - that leads to the
+        // will trigger the rebuild of this screen - that leads to the
         // update of the UI with the product image is updated.
       });
     }
@@ -52,15 +55,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _saveForm() {
     var isValid = _form.currentState.validate();
-    print(isValid);
     if (!isValid) {
       return;
     }
     _form.currentState.save();
-    print(_editedProduct.title);
-    print(_editedProduct.price);
-    print(_editedProduct.description);
-    print(_editedProduct.imageUrl);
+
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    Navigator.of(context).pop(); // Go back to the user_products_screen
   }
 
   bool _isValidUrl(String url) {
@@ -193,9 +194,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         textInputAction: TextInputAction.done,
                         controller: _imageUrlController,
                         focusNode: _imageUrlFocusNode,
-                        onFieldSubmitted: (value) {
-                          _saveForm();
-                        },
+                        onFieldSubmitted: (value) => _saveForm(),
                         onSaved: (newValue) {
                           _editedProduct = Product(
                             id: _editedProduct.id,
