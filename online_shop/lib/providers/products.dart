@@ -71,21 +71,22 @@ class Products with ChangeNotifier {
         },
       ),
     )
-        .then(
-      (response) {
-        print(json.decode(response.body));
-        _items.add(
-          Product(
-            id: json.decode(response.body)['name'],
-            title: item.title,
-            description: item.description,
-            price: item.price,
-            imageUrl: item.imageUrl,
-          ),
-        );
-        notifyListeners();
-      },
-    );
+        .then((response) {
+      print(json.decode(response.body));
+      _items.add(
+        Product(
+          id: json.decode(response.body)['name'],
+          title: item.title,
+          description: item.description,
+          price: item.price,
+          imageUrl: item.imageUrl,
+        ),
+      );
+      notifyListeners();
+    }).catchError((error) {
+      print(error);
+      throw error;
+    });
   }
 
   void updateProduct(String productId, Product item) {
