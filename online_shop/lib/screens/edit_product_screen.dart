@@ -78,7 +78,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final isValid = _form.currentState.validate();
     if (!isValid) {
       return;
@@ -87,10 +87,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     _showLoading(true);
     if (_editedProduct.id == null) {
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) {
-        return showDialog<Null>(
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        // Use await here to keep the code inside the finally wait for
+        // this showDialog being poped out (after user clicks Okay)
+        await showDialog<Null>(
           context: context,
           builder: (context) => AlertDialog(
             title: Text('An error occured!'),
@@ -105,10 +108,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-      }).then((_) {
+      } finally {
         _showLoading(false);
         Navigator.of(context).pop(); // Go back to the user_products_screen
-      });
+      }
     } else {
       Provider.of<Products>(context, listen: false).updateProduct(
         _editedProduct.id,
