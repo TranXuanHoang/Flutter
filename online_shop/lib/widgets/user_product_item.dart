@@ -15,6 +15,7 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var scaffold = Scaffold.of(context);
     return Column(
       children: <Widget>[
         ListTile(
@@ -76,10 +77,21 @@ class UserProductItem extends StatelessWidget {
                         ],
                       ),
                     );
-                    deleteConfirm.then((wantToDelete) {
+                    deleteConfirm.then((wantToDelete) async {
                       if (wantToDelete == true) {
-                        Provider.of<Products>(context, listen: false)
-                            .deleteProduct(product.id);
+                        try {
+                          await Provider.of<Products>(context, listen: false)
+                              .deleteProduct(product.id);
+                        } catch (error) {
+                          scaffold.showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                error.toString(),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        }
                       }
                     });
                   },

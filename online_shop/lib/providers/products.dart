@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import './product.dart';
+import '../models/http_exception.dart';
 
 class Products with ChangeNotifier {
   final List<Product> _items = [
@@ -137,8 +138,26 @@ class Products with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String productId) {
-    _items.removeWhere((item) => item.id == productId);
+  /// Optimistically deletes the product first, then send HTTP DELETE
+  /// to delete its data from the remote web server's database.
+  /// If the HTTP DELETE failed, then rolls back by inserting the removed
+  /// product into the original list of product at the original index.
+  Future<void> deleteProduct(String productId) async {
+    final url =
+        'https://flutter-update-67603.firebaseio.com/products/$productId.json';
+
+    final existingProductIndex =
+        _items.indexWhere((item) => item.id == productId);
+    var existingProduct = _items.removeAt(existingProductIndex);
     notifyListeners();
+
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException('Deleting failed!');
+    }
+
+    existingProduct = null;
   }
 }
