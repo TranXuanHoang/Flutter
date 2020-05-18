@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import './cart_screen.dart';
 import '../providers/cart.dart';
+import '../providers/products.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/badge.dart';
 import '../widgets/products_grid.dart';
@@ -19,6 +20,36 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   FilterOptions _filterOption = FilterOptions.All;
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Can use the following hack to fetch data inside the initState.
+    // Here, we do the data fetching inside the didChangeDependencies.
+    // Future.delayed(Duration.zero).then((_) {
+    //   Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+    // });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _showLoading(true);
+      Provider.of<Products>(context)
+          .fetchAndSetProducts()
+          .then((_) => _showLoading(false));
+    }
+    _isInit = false;
+  }
+
+  void _showLoading(bool shouldShow) {
+    setState(() {
+      _isLoading = shouldShow;
+    });
+  }
 
   bool _showOnlyFavorites() {
     switch (_filterOption) {
@@ -74,7 +105,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: ProductsGrid(_showOnlyFavorites()),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavorites()),
     );
   }
 }
