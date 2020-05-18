@@ -86,15 +86,13 @@ class Products with ChangeNotifier {
     try {
       final response = await http.post(
         url,
-        body: json.encode(
-          {
-            'title': item.title,
-            'description': item.description,
-            'price': item.price,
-            'imageUrl': item.imageUrl,
-            'isFavorite': item.isFavorite,
-          },
-        ),
+        body: json.encode({
+          'title': item.title,
+          'description': item.description,
+          'price': item.price,
+          'imageUrl': item.imageUrl,
+          'isFavorite': item.isFavorite,
+        }),
       );
 
       print(json.decode(response.body));
@@ -114,11 +112,28 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String productId, Product item) {
+  Future<void> updateProduct(String productId, Product item) async {
     final existingIndex = _items.indexWhere((item) => item.id == productId);
     if (existingIndex >= 0) {
-      _items[existingIndex] = item;
-      notifyListeners();
+      try {
+        final url =
+            'https://flutter-update-67603.firebaseio.com/products/$productId/.json';
+        await http.patch(
+          url,
+          body: json.encode({
+            'title': item.title,
+            'description': item.description,
+            'price': item.price,
+            'imageUrl': item.imageUrl,
+            // No need to update isFavorite
+          }),
+        );
+        _items[existingIndex] = item;
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 

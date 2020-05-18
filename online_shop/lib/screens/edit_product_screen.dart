@@ -86,37 +86,36 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _form.currentState.save();
 
     _showLoading(true);
-    if (_editedProduct.id == null) {
-      try {
+    try {
+      if (_editedProduct.id == null) {
         await Provider.of<Products>(context, listen: false)
             .addProduct(_editedProduct);
-      } catch (error) {
-        // Use await here to keep the code inside the finally wait for
-        // this showDialog being poped out (after user clicks Okay)
-        await showDialog<Null>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('An error occured!'),
-            content: Text('Something went wrong.'),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  return Navigator.of(context).pop();
-                },
-                child: Text('Okay'),
-              ),
-            ],
-          ),
+      } else {
+        await Provider.of<Products>(context, listen: false).updateProduct(
+          _editedProduct.id,
+          _editedProduct,
         );
-      } finally {
-        _showLoading(false);
-        Navigator.of(context).pop(); // Go back to the user_products_screen
       }
-    } else {
-      Provider.of<Products>(context, listen: false).updateProduct(
-        _editedProduct.id,
-        _editedProduct,
+    } catch (error) {
+      // Use await here to keep the code inside the finally wait for
+      // this showDialog being poped out (after user clicks Okay)
+      await showDialog<Null>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('An error occured!'),
+          content: Text('Something went wrong.'),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                return Navigator.of(context).pop();
+              },
+              child: Text('Okay'),
+            ),
+          ],
+        ),
       );
+    } finally {
+      _showLoading(false);
       Navigator.of(context).pop(); // Go back to the user_products_screen
     }
   }
