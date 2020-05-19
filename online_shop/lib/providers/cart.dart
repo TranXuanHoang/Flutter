@@ -14,6 +14,21 @@ class CartItem {
     @required this.price,
     @required this.quantity,
   });
+
+  CartItem.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        title = json['title'],
+        imageUrl = json['imageUrl'],
+        price = json['price'],
+        quantity = json['quantity'];
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'imageUrl': imageUrl,
+        'price': price,
+        'quantity': quantity,
+      };
 }
 
 class Cart with ChangeNotifier {

@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import './cart.dart';
 
@@ -14,6 +18,21 @@ class OrderItem {
     @required this.products,
     @required this.dateTime,
   });
+
+  OrderItem.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        amount = json['amount'],
+        products = (json['products'] as List<dynamic>)
+            .map((productJson) => CartItem.fromJson(productJson))
+            .toList(),
+        dateTime = DateTime.parse(json['dateTime']);
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'amount': amount,
+        'products': products.map((product) => product.toJson()).toList(),
+        'dateTime': DateFormat().format(dateTime),
+      };
 }
 
 class Orders with ChangeNotifier {
@@ -23,16 +42,41 @@ class Orders with ChangeNotifier {
     return [..._orders];
   }
 
-  void addOrder(List<CartItem> cartProducts, double total) {
-    _orders.insert(
-      0,
-      OrderItem(
-        id: DateTime.now().toString(),
-        amount: total,
-        products: cartProducts,
-        dateTime: DateTime.now(),
-      ),
-    );
-    notifyListeners();
+  Future<void> addOrder(List<CartItem> cartProducts, double total) async {
+    final url = 'https://flutter-update-67603.firebaseio.com/orders.json';
+    final timestamp = DateTime.now();
+    try {
+      final response = await http.post(
+        url,
+        // body: json.encode(orderItem.toJson()),
+        body: json.encode({
+          'amount': total,
+          'dateTime': timestamp.toIso8601String(),
+          'products': cartProducts
+              .map((cp) => {
+                    'id': cp.id,
+                    'title': cp.title,
+                    'imageUrl': cp.imageUrl,
+                    'price': cp.price,
+                    'quantity': cp.quantity,
+                  })
+              .toList(),
+        }),
+      );
+
+      _orders.insert(
+        0,
+        OrderItem(
+          id: json.decode(response.body)['name'],
+          amount: total,
+          products: cartProducts,
+          dateTime: timestamp,
+        ),
+      );
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
   }
 }

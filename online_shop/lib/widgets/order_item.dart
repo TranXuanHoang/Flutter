@@ -26,7 +26,7 @@ class _OrderItemState extends State<OrderItem> {
           Container(
             child: ListTile(
               key: ValueKey(widget.order.id),
-              title: Text('\$${widget.order.amount}'),
+              title: Text('\$${widget.order.amount.toStringAsFixed(2)}'),
               subtitle: Text(
                 DateFormat('MMM dd, yyyy  HH:mm').format(widget.order.dateTime),
               ),

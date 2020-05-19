@@ -39,23 +39,7 @@ class CartScreen extends StatelessWidget {
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  FlatButton(
-                    onPressed: () {
-                      if (cart.items.length == 0) {
-                        // Donot place the order if there is no items in cart
-                        return;
-                      }
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                        cart.items.values.toList(),
-                        cart.totalAmount,
-                      );
-                      cart.clear();
-                      Navigator.of(context)
-                          .pushReplacementNamed(OrdersScreen.routeName);
-                    },
-                    child: Text('ORDER NOW'),
-                    textColor: Theme.of(context).primaryColor,
-                  )
+                  OrderButton(cart: cart)
                 ],
               ),
             ),
@@ -75,6 +59,49 @@ class CartScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key key,
+    @required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isLoading = false;
+
+  void _showLoading(bool shouldShow) {
+    setState(() {
+      _isLoading = shouldShow;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      onPressed: widget.cart.items.length == 0
+          ? null // disable the button when there aren't any items in cart
+          : () async {
+              _showLoading(true);
+              await Provider.of<Orders>(context, listen: false).addOrder(
+                widget.cart.items.values.toList(),
+                widget.cart.totalAmount,
+              );
+              _showLoading(false);
+              widget.cart.clear();
+              Navigator.of(context)
+                  .pushReplacementNamed(OrdersScreen.routeName);
+            },
+      child: _isLoading ? CircularProgressIndicator() : Text('ORDER NOW'),
+      textColor: Theme.of(context).primaryColor,
     );
   }
 }
