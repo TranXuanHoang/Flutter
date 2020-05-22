@@ -1,8 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:online_shop/providers/auth.dart';
 import 'package:provider/provider.dart';
+
+import '../providers/auth.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -152,6 +153,10 @@ class _AuthCardState extends State<AuthCard> {
     _showLoading(true);
     if (_authMode == AuthMode.Login) {
       // Log user in
+      await Provider.of<Auth>(context, listen: false).login(
+        _authData['email'],
+        _authData['password'],
+      );
     } else {
       // Sign user up
       await Provider.of<Auth>(context, listen: false).signup(
@@ -258,7 +263,7 @@ class _AuthCardState extends State<AuthCard> {
                     if (value.isEmpty) {
                       return 'Please input password.';
                     }
-                    if (value.length < 5) {
+                    if (value.length < 6) {
                       return 'Password is too short!';
                     }
                     return null;
