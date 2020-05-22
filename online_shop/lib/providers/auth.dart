@@ -16,6 +16,20 @@ class Auth with ChangeNotifier {
   /// Saves 'localId' - The uid of the newly created user.
   String _userId;
 
+  bool get isAuth {
+    return token != null;
+  }
+
+  String get token {
+    if (_expiryDate != null &&
+        _expiryDate.isAfter(DateTime.now()) &&
+        _token != null &&
+        _userId != null) {
+      return _token;
+    }
+    return null;
+  }
+
   Future<void> authenticate(
       String email, String password, String endpointSegment) async {
     final url =
@@ -38,8 +52,13 @@ class Auth with ChangeNotifier {
     }
 
     _token = responseData['idToken'];
-    _expiryDate = DateTime.now()
-        .add(Duration(seconds: int.parse(responseData['expiresIn'])));
+    _expiryDate = DateTime.now().add(
+      Duration(
+        seconds: int.parse(
+          responseData['expiresIn'],
+        ),
+      ),
+    );
     _userId = responseData['localId'];
     print('Token: $_token');
     print(
@@ -48,7 +67,7 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Signs up a user using email and password. The sign up here uses the Firebase's 
+  /// Signs up a user using email and password. The sign up here uses the Firebase's
   /// [sign up with email / password API](https://firebase.google.com/docs/reference/rest/auth#section-create-email-password).
   Future<void> signup(String email, String password) async {
     return authenticate(email, password, 'signUp');
@@ -56,7 +75,7 @@ class Auth with ChangeNotifier {
 
   /// Signs in a user using email and password. The sign in here is
   /// conducted by sending an HTTP POST request and authenticates the user with
-  /// Google Firebase. See Firebase's 
+  /// Google Firebase. See Firebase's
   /// [sign in with email / password](https://firebase.google.com/docs/reference/rest/auth#section-sign-in-email-password)
   /// doc for more information.
   Future<void> login(String email, String password) async {
