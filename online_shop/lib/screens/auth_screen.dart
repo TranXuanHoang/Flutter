@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:online_shop/models/http_exception.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
@@ -139,6 +140,22 @@ class _AuthCardState extends State<AuthCard> {
     _confirmPasswordFocusNode.dispose();
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error Occurred!'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Okay'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     print('Before: ' + _authData['email']);
     print('Before: ' + _authData['password']);
@@ -151,18 +168,28 @@ class _AuthCardState extends State<AuthCard> {
     print('Saved: ' + _authData['password']);
 
     _showLoading(true);
-    if (_authMode == AuthMode.Login) {
-      // Log user in
-      await Provider.of<Auth>(context, listen: false).login(
-        _authData['email'],
-        _authData['password'],
-      );
-    } else {
-      // Sign user up
-      await Provider.of<Auth>(context, listen: false).signup(
-        _authData['email'],
-        _authData['password'],
-      );
+    try {
+      if (_authMode == AuthMode.Login) {
+        // Log user in
+        await Provider.of<Auth>(context, listen: false).login(
+          _authData['email'],
+          _authData['password'],
+        );
+      } else {
+        // Sign user up
+        await Provider.of<Auth>(context, listen: false).signup(
+          _authData['email'],
+          _authData['password'],
+        );
+      }
+    } on HttpException catch (error) {
+      final errorMessage = Auth.errorMessage(error.toString());
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      // Other kinds of errors (network connnection, etc.)
+      const errorMessage =
+          'Could not authenticate you. Please try again later.';
+      _showErrorDialog(errorMessage);
     }
     _showLoading(false);
   }
@@ -263,7 +290,7 @@ class _AuthCardState extends State<AuthCard> {
                     if (value.isEmpty) {
                       return 'Please input password.';
                     }
-                    if (value.length < 6) {
+                    if (value.length < 5) {
                       return 'Password is too short!';
                     }
                     return null;
