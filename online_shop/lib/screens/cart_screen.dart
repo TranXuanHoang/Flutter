@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import './orders_screen.dart';
+import '../models/http_exception.dart';
 import '../providers/cart.dart' show Cart;
 import '../providers/orders.dart';
 import '../widgets/cart_item.dart';
@@ -84,6 +85,19 @@ class _OrderButtonState extends State<OrderButton> {
     });
   }
 
+  void _showAlertMessage(String message) {
+    Scaffold.of(context).hideCurrentSnackBar();
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+        ),
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FlatButton(
@@ -91,14 +105,21 @@ class _OrderButtonState extends State<OrderButton> {
           ? null // disable the button when there aren't any items in cart
           : () async {
               _showLoading(true);
-              await Provider.of<Orders>(context, listen: false).addOrder(
-                widget.cart.items.values.toList(),
-                widget.cart.totalAmount,
-              );
+              try {
+                await Provider.of<Orders>(context, listen: false).addOrder(
+                  widget.cart.items.values.toList(),
+                  widget.cart.totalAmount,
+                );
+                widget.cart.clear();
+                Navigator.of(context)
+                    .pushReplacementNamed(OrdersScreen.routeName);
+              } on HttpException catch (error) {
+                _showAlertMessage(error.message);
+              } catch (error) {
+                _showAlertMessage(
+                    'Failed to place the order! Check your Internet connection.');
+              }
               _showLoading(false);
-              widget.cart.clear();
-              Navigator.of(context)
-                  .pushReplacementNamed(OrdersScreen.routeName);
             },
       child: _isLoading ? CircularProgressIndicator() : Text('ORDER NOW'),
       textColor: Theme.of(context).primaryColor,

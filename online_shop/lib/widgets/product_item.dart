@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/providers/cart.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/auth.dart';
+import '../providers/cart.dart';
 import '../providers/product.dart';
 import '../screens/product_detail_screen.dart';
 
@@ -12,6 +13,7 @@ class ProductItem extends StatelessWidget {
     // continuing to listen to the data change event. This is to avoid
     // re-building the whole ClipRRect and its child widgets.
     final product = Provider.of<Product>(context, listen: false);
+    final auth = Provider.of<Auth>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GestureDetector(
@@ -31,13 +33,13 @@ class ProductItem extends StatelessWidget {
             // Use Consumer here to only rebuild the favorite IconButton
             // when the state changes
             leading: Consumer<Product>(
-              builder: (context, value, child) => IconButton(
+              builder: (context, product, child) => IconButton(
                 icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border,
                 ),
                 color: Theme.of(context).accentColor,
                 onPressed: () {
-                  product.toggleIsFavorite();
+                  product.toggleIsFavorite(auth.token);
                 },
               ),
             ),

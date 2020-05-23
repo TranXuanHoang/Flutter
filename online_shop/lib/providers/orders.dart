@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import './cart.dart';
+import '../models/http_exception.dart';
 
 class OrderItem {
   final String id;
@@ -37,17 +38,26 @@ class OrderItem {
 
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
+  final String authToken;
+
+  Orders({
+    @required this.authToken,
+    @required List<OrderItem> orders,
+  }) : _orders = orders;
 
   List<OrderItem> get orders {
     return [..._orders];
   }
 
   Future<void> fetchAndSetOrders() async {
-    const url = 'https://flutter-update-67603.firebaseio.com/orders.json';
+    final url =
+        'https://flutter-update-67603.firebaseio.com/orders.json?auth=$authToken';
     try {
       final response = await http.get(url);
+      if (response.statusCode >= 400) {
+        throw HttpException('Loading placed orders failed.');
+      }
       final ordersData = json.decode(response.body) as Map<String, dynamic>;
-      
       final List<OrderItem> orders = [];
       ordersData.forEach((orderId, orderData) {
         orders.insert(
@@ -71,7 +81,8 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
-    const url = 'https://flutter-update-67603.firebaseio.com/orders.json';
+    final url =
+        'https://flutter-update-67603.firebaseio.com/orders.json?auth=$authToken';
     final timestamp = DateTime.now();
     try {
       final response = await http.post(
@@ -91,7 +102,9 @@ class Orders with ChangeNotifier {
               .toList(),
         }),
       );
-
+      if (response.statusCode >= 400) {
+        throw HttpException('Could not place the order.');
+      }
       _orders.insert(
         0,
         OrderItem(
