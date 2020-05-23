@@ -7,7 +7,7 @@ import './product.dart';
 import '../models/http_exception.dart';
 
 class Products with ChangeNotifier {
-  final List<Product> _items = [
+  List<Product> _items = [
     // Product(
     //   id: 'p1',
     //   title: 'Red Shirt',
@@ -42,6 +42,20 @@ class Products with ChangeNotifier {
     // ),
   ];
 
+  final String authToken;
+
+  /// * [authToken] is the authentication token obtained after successfully
+  /// authenticating (will be provided by the [Auth]).
+  /// * [items] is a list of [Product]s previously saved in the [_items] of this [Products].
+  /// At the initial step, this [items] should be set as an empty list. Then after
+  /// successfully logging in, it will be set to a list of products fetched from
+  /// the remote server. That list of fetched products will be passed to
+  /// this constructor whenever the [ChangeNotifierProxyProvider] calls its update function.
+  Products({
+    @required this.authToken,
+    @required List<Product> items,
+  }) : _items = items;
+
   List<Product> get items {
     return [..._items];
   }
@@ -58,9 +72,13 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    const url = 'https://flutter-update-67603.firebaseio.com/products.json';
+    final url =
+        'https://flutter-update-67603.firebaseio.com/products.json?auth=$authToken';
     try {
       final response = await http.get(url);
+      if (response.statusCode >= 400) {
+        throw HttpException('Loading products failed.');
+      }
       final productsData = json.decode(response.body) as Map<String, dynamic>;
       List<Product> products = [];
       productsData.forEach((productId, productData) {
@@ -83,7 +101,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product item) async {
-    const url = 'https://flutter-update-67603.firebaseio.com/products.json';
+    final url =
+        'https://flutter-update-67603.firebaseio.com/products.json?auth=$authToken';
     try {
       final response = await http.post(
         url,
@@ -96,7 +115,9 @@ class Products with ChangeNotifier {
         }),
       );
 
-      print(json.decode(response.body));
+      if (response.statusCode >= 400) {
+        throw HttpException('Adding new product failed.');
+      }
       _items.add(
         Product(
           id: json.decode(response.body)['name'],
@@ -118,8 +139,8 @@ class Products with ChangeNotifier {
     if (existingIndex >= 0) {
       try {
         final url =
-            'https://flutter-update-67603.firebaseio.com/products/$productId/.json';
-        await http.patch(
+            'https://flutter-update-67603.firebaseio.com/products/$productId.json?auth=$authToken';
+        final response = await http.patch(
           url,
           body: json.encode({
             'title': item.title,
@@ -129,6 +150,10 @@ class Products with ChangeNotifier {
             // No need to update isFavorite
           }),
         );
+
+        if (response.statusCode >= 400) {
+          throw HttpException('Could not update product.');
+        }
         _items[existingIndex] = item;
         notifyListeners();
       } catch (error) {
@@ -144,7 +169,7 @@ class Products with ChangeNotifier {
   /// product into the original list of product at the original index.
   Future<void> deleteProduct(String productId) async {
     final url =
-        'https://flutter-update-67603.firebaseio.com/products/$productId.json';
+        'https://flutter-update-67603.firebaseio.com/products/$productId.json?auth=$authToken';
 
     final existingProductIndex =
         _items.indexWhere((item) => item.id == productId);
@@ -158,6 +183,7 @@ class Products with ChangeNotifier {
       throw HttpException('Deleting failed!');
     }
 
+    // Free not-used object
     existingProduct = null;
   }
 }
