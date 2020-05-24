@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -15,6 +16,9 @@ class Auth with ChangeNotifier {
 
   /// Saves 'localId' - The uid of the newly created user.
   String _userId;
+
+  /// Automatically runs the 'logout' method t log the user out.
+  Timer _authTimer;
 
   bool get isAuth {
     return token != null;
@@ -64,6 +68,7 @@ class Auth with ChangeNotifier {
       ),
     );
     _userId = responseData['localId'];
+    _autoLogout();
     print('Token: $_token');
     print(
         'ExpiryDate: ${DateFormat("yyyy-MM-dd HH:mm:ss").format(_expiryDate)}');
@@ -90,7 +95,20 @@ class Auth with ChangeNotifier {
     _token = null;
     _expiryDate = null;
     _userId = null;
+    if (_authTimer != null) {
+      _authTimer.cancel();
+      _authTimer = null;
+    }
+
     notifyListeners();
+  }
+
+  void _autoLogout() {
+    if (_authTimer != null) {
+      _authTimer.cancel();
+    }
+    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 
   static String errorMessage(String inputMsg) {
