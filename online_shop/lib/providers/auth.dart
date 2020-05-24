@@ -86,6 +86,13 @@ class Auth with ChangeNotifier {
     return authenticate(email, password, 'signInWithPassword');
   }
 
+  void logout() {
+    _token = null;
+    _expiryDate = null;
+    _userId = null;
+    notifyListeners();
+  }
+
   static String errorMessage(String inputMsg) {
     var outputMsg = 'Authentication failed.';
 

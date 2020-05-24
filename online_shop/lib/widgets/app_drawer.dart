@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop/screens/user_products_screen.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/auth.dart';
 import '../screens/orders_screen.dart';
+import '../screens/user_products_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -32,6 +34,21 @@ class AppDrawer extends StatelessWidget {
             title: Text('Manage Products'),
             onTap: () => Navigator.of(context)
                 .pushReplacementNamed(UserProductsScreen.routeName),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text('Logout'),
+            onTap: () {
+              // Pop out the drawer first
+              Navigator.of(context).pop();
+
+              Provider.of<Auth>(context, listen: false).logout();
+
+              // Remove all the routes below the pushed route (home screen)
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/', (Route<dynamic> route) => false);
+            },
           ),
         ],
       ),
