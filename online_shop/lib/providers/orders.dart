@@ -39,9 +39,11 @@ class OrderItem {
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
   final String authToken;
+  final String userId;
 
   Orders({
     @required this.authToken,
+    @required this.userId,
     @required List<OrderItem> orders,
   }) : _orders = orders;
 
@@ -51,13 +53,17 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     final url =
-        'https://flutter-update-67603.firebaseio.com/orders.json?auth=$authToken';
+        'https://flutter-update-67603.firebaseio.com/orders/$userId.json?auth=$authToken';
     try {
       final response = await http.get(url);
       if (response.statusCode >= 400) {
         throw HttpException('Loading placed orders failed.');
       }
       final ordersData = json.decode(response.body) as Map<String, dynamic>;
+      if (ordersData == null) {
+        return;
+      }
+
       final List<OrderItem> orders = [];
       ordersData.forEach((orderId, orderData) {
         orders.insert(
@@ -82,7 +88,7 @@ class Orders with ChangeNotifier {
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url =
-        'https://flutter-update-67603.firebaseio.com/orders.json?auth=$authToken';
+        'https://flutter-update-67603.firebaseio.com/orders/$userId.json?auth=$authToken';
     final timestamp = DateTime.now();
     try {
       final response = await http.post(

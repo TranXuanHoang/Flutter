@@ -33,10 +33,16 @@ class OrdersScreen extends StatelessWidget {
             } else {
               // Data fetching was done, no error occurred
               return Consumer<Orders>(
-                builder: (context, ordersData, child) => ListView.builder(
-                  itemCount: ordersData.orders.length,
-                  itemBuilder: (context, i) => OrderItem(ordersData.orders[i]),
-                ),
+                builder: (context, ordersData, child) =>
+                    ordersData.orders.length == 0
+                        ? Center(
+                            child: Text('No orders placed yet!'),
+                          )
+                        : ListView.builder(
+                            itemCount: ordersData.orders.length,
+                            itemBuilder: (context, i) =>
+                                OrderItem(ordersData.orders[i]),
+                          ),
               );
             }
           }
