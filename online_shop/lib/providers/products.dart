@@ -43,9 +43,12 @@ class Products with ChangeNotifier {
   ];
 
   final String authToken;
+  final String userId;
 
   /// * [authToken] is the authentication token obtained after successfully
   /// authenticating (will be provided by the [Auth]).
+  /// * [userId] is the unique id assigned to each user after succesfully registering
+  /// a user account with this app. The [usreId] is loaded and save locally after logging in.
   /// * [items] is a list of [Product]s previously saved in the [_items] of this [Products].
   /// At the initial step, this [items] should be set as an empty list. Then after
   /// successfully logging in, it will be set to a list of products fetched from
@@ -53,6 +56,7 @@ class Products with ChangeNotifier {
   /// this constructor whenever the [ChangeNotifierProxyProvider] calls its update function.
   Products({
     @required this.authToken,
+    @required this.userId,
     @required List<Product> items,
   }) : _items = items;
 
@@ -72,7 +76,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final url =
+    var url =
         'https://flutter-update-67603.firebaseio.com/products.json?auth=$authToken';
     try {
       final response = await http.get(url);
@@ -80,6 +84,18 @@ class Products with ChangeNotifier {
         throw HttpException('Loading products failed.');
       }
       final productsData = json.decode(response.body) as Map<String, dynamic>;
+      if (productsData == null) {
+        return;
+      }
+
+      url =
+          'https://flutter-update-67603.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(url);
+      if (favoriteResponse.statusCode >= 400) {
+        throw HttpException('Loading favorite failed.');
+      }
+      final favoriteData = json.decode(favoriteResponse.body);
+
       List<Product> products = [];
       productsData.forEach((productId, productData) {
         products.add(Product(
@@ -88,7 +104,8 @@ class Products with ChangeNotifier {
           description: productData['description'],
           price: productData['price'],
           imageUrl: productData['imageUrl'],
-          isFavorite: productData['isFavorite'],
+          isFavorite:
+              favoriteData == null ? false : favoriteData[productId] ?? false,
         ));
       });
       _items.clear();
@@ -111,7 +128,7 @@ class Products with ChangeNotifier {
           'description': item.description,
           'price': item.price,
           'imageUrl': item.imageUrl,
-          'isFavorite': item.isFavorite,
+          // No need to add isFavorite
         }),
       );
 
@@ -168,19 +185,33 @@ class Products with ChangeNotifier {
   /// If the HTTP DELETE failed, then rolls back by inserting the removed
   /// product into the original list of product at the original index.
   Future<void> deleteProduct(String productId) async {
-    final url =
-        'https://flutter-update-67603.firebaseio.com/products/$productId.json?auth=$authToken';
-
     final existingProductIndex =
         _items.indexWhere((item) => item.id == productId);
     var existingProduct = _items.removeAt(existingProductIndex);
     notifyListeners();
 
+    var url =
+        'https://flutter-update-67603.firebaseio.com/products/$productId.json?auth=$authToken';
     final response = await http.delete(url);
-    if (response.statusCode >= 400) {
+
+    url =
+        'https://flutter-update-67603.firebaseio.com/userFavorites/$userId/$productId.json?auth=$authToken';
+    final favoriteResponse = await http.delete(url);
+
+    if (response.statusCode >= 400 || favoriteResponse.statusCode >= 400) {
       _items.insert(existingProductIndex, existingProduct);
       notifyListeners();
-      throw HttpException('Deleting failed!');
+
+      if (response.statusCode >= 400 && favoriteResponse.statusCode < 400) {
+        throw HttpException('Deleting product failed!');
+      }
+      if (response.statusCode < 400 && favoriteResponse.statusCode >= 400) {
+        throw HttpException('Deleting favorite failed.');
+      }
+      if (response.statusCode >= 400 && favoriteResponse.statusCode >= 400) {
+        throw HttpException(
+            'Both deleting product and deleting favorite failed.');
+      }
     }
 
     // Free not-used object

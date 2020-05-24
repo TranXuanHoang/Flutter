@@ -25,18 +25,19 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleIsFavorite(String authToken) async {
+  Future<void> toggleIsFavorite(String authToken, String userId) async {
     // Toggle the isFavorite in local memory first
     _toggleIsFavoriteInLocalMemory();
 
     // Update data from remote server using HTTP PATCH request
-    final url = 'https://flutter-update-67603.firebaseio.com/products/$id.json?auth=$authToken';
+    final url =
+        'https://flutter-update-67603.firebaseio.com/userFavorites/$userId/$id.json?auth=$authToken';
     try {
-      final response = await http.patch(
+      final response = await http.put(
         url,
-        body: json.encode({
-          'isFavorite': isFavorite,
-        }),
+        body: json.encode(
+          isFavorite,
+        ),
       );
 
       // Roll back if the HTTP PATCH response is an error
