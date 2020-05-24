@@ -43,11 +43,11 @@ class AppDrawer extends StatelessWidget {
               // Pop out the drawer first
               Navigator.of(context).pop();
 
-              Provider.of<Auth>(context, listen: false).logout();
-
               // Remove all the routes below the pushed route (home screen)
               Navigator.of(context).pushNamedAndRemoveUntil(
                   '/', (Route<dynamic> route) => false);
+
+              Provider.of<Auth>(context, listen: false).logout();
             },
           ),
         ],

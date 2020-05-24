@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/http_exception.dart';
 
@@ -69,11 +69,21 @@ class Auth with ChangeNotifier {
     );
     _userId = responseData['localId'];
     _autoLogout();
-    print('Token: $_token');
-    print(
-        'ExpiryDate: ${DateFormat("yyyy-MM-dd HH:mm:ss").format(_expiryDate)}');
-    print('UserID: $_userId');
     notifyListeners();
+
+    // Save authentication data to the persistent storage of device
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs != null && prefs.containsKey('userData')) {
+      await prefs.remove('userData');
+    }
+    prefs.setString(
+      'userData',
+      json.encode({
+        'token': _token,
+        'expiryDate': _expiryDate.toIso8601String(),
+        'userId': _userId,
+      }),
+    );
   }
 
   /// Signs up a user using email and password. The sign up here uses the Firebase's
@@ -91,7 +101,26 @@ class Auth with ChangeNotifier {
     return authenticate(email, password, 'signInWithPassword');
   }
 
-  void logout() {
+  Future<bool> tryAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs == null || !prefs.containsKey('userData')) {
+      return false;
+    }
+    final userData =
+        json.decode(prefs.getString('userData')) as Map<String, dynamic>;
+    final expiryDate = DateTime.parse(userData['expiryDate']);
+    if (expiryDate.isBefore(DateTime.now())) {
+      return false;
+    }
+    _token = userData['token'];
+    _expiryDate = expiryDate;
+    _userId = userData['userId'];
+    notifyListeners();
+    _autoLogout();
+    return true;
+  }
+
+  Future<void> logout() async {
     _token = null;
     _expiryDate = null;
     _userId = null;
@@ -99,8 +128,12 @@ class Auth with ChangeNotifier {
       _authTimer.cancel();
       _authTimer = null;
     }
-
     notifyListeners();
+    var prefs = await SharedPreferences.getInstance();
+    if (prefs != null && prefs.containsKey('userData')) {
+      await prefs.remove('userData');
+      prefs = null;
+    }
   }
 
   void _autoLogout() {
