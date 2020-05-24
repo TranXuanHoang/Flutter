@@ -13,7 +13,8 @@ class UserProductsScreen extends StatelessWidget {
 
   Future<void> _refreshProducts(BuildContext context) async {
     try {
-      await Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+      await Provider.of<Products>(context, listen: false)
+          .fetchAndSetProducts(true);
     } catch (error) {
       _scaffoldKey.currentState.hideCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(
@@ -29,7 +30,6 @@ class UserProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final productsData = Provider.of<Products>(context);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -44,17 +44,29 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => _refreshProducts(context),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemBuilder: (context, index) => UserProductItem(
-              product: productsData.items[index],
-            ),
-            itemCount: productsData.items.length,
-          ),
-        ),
+      // Use FutureBuilder to fetch the list of products created by
+      // this user when the page is first loaded (the build method is called).
+      body: FutureBuilder(
+        future: _refreshProducts(context),
+        builder: (context, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => _refreshProducts(context),
+                    child: Consumer<Products>(
+                      builder: (context, productsData, _) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListView.builder(
+                          itemBuilder: (context, index) => UserProductItem(
+                            product: productsData.items[index],
+                          ),
+                          itemCount: productsData.items.length,
+                        ),
+                      ),
+                    ),
+                  ),
       ),
     );
   }

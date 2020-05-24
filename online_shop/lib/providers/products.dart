@@ -75,9 +75,16 @@ class Products with ChangeNotifier {
     );
   }
 
-  Future<void> fetchAndSetProducts() async {
+  /// See Firebase's [Retrieving Data](https://firebase.google.com/docs/database/rest/retrieve-data)
+  /// doc for more information on how to retrieve data from Firebase.
+  /// * Note: Add Indexing to your Firebase Realtime Database Rules:
+  /// If you're using orderBy in your app, you need to define the keys
+  /// you will be indexing on via the .indexOn rule in your
+  /// Firebase Realtime Database Rules.
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filter = filterByUser ? '&orderBy="creatorId"&equalTo="$userId"' : '';
     var url =
-        'https://flutter-update-67603.firebaseio.com/products.json?auth=$authToken';
+        'https://flutter-update-67603.firebaseio.com/products.json?auth=$authToken$filter';
     try {
       final response = await http.get(url);
       if (response.statusCode >= 400) {
@@ -124,6 +131,7 @@ class Products with ChangeNotifier {
       final response = await http.post(
         url,
         body: json.encode({
+          'creatorId': userId,
           'title': item.title,
           'description': item.description,
           'price': item.price,
@@ -194,6 +202,11 @@ class Products with ChangeNotifier {
         'https://flutter-update-67603.firebaseio.com/products/$productId.json?auth=$authToken';
     final response = await http.delete(url);
 
+    // Note that the following delete request only deletes the favorite
+    // data mapped to the user who has $userId, but doesn't delete the favorite
+    // data of the $productId that may also be favorite products of the other users.
+    // Should continue work on this issue to make sure that products and favorites
+    // data is consitent.
     url =
         'https://flutter-update-67603.firebaseio.com/userFavorites/$userId/$productId.json?auth=$authToken';
     final favoriteResponse = await http.delete(url);
