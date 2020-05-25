@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:online_shop/models/http_exception.dart';
 import 'package:provider/provider.dart';
 
+import '../models/http_exception.dart';
 import '../providers/auth.dart';
 
 enum AuthMode { Signup, Login }
@@ -90,7 +90,8 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+class _AuthCardState extends State<AuthCard>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   var _authMode = AuthMode.Login;
   Map<String, String> _authData = {
@@ -106,10 +107,29 @@ class _AuthCardState extends State<AuthCard> {
   var _autovalidateConfirmPassword = false;
   var _confirmPassworMatches = false;
 
+  AnimationController _controller;
+  Animation<Size> _heightAnimation;
+
   @override
   void initState() {
     super.initState();
     _confirmPasswordController.addListener(_confirmPasswordListener);
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 300,
+      ),
+    );
+    _heightAnimation = Tween<Size>(
+      begin: Size(double.infinity, 260), // size for login
+      end: Size(double.infinity, 320), // size for sign up
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.linear,
+      ),
+    );
   }
 
   void _confirmPasswordListener() {
@@ -200,10 +220,12 @@ class _AuthCardState extends State<AuthCard> {
         // Change auth mode
         _authMode = AuthMode.Signup;
         _confirmPasswordController.addListener(_confirmPasswordListener);
+        _controller.forward();
       } else {
         // Change auth mode
         _authMode = AuthMode.Login;
         _confirmPasswordController.removeListener(_confirmPasswordListener);
+        _controller.reverse();
       }
 
       // Clear input fields
@@ -223,15 +245,23 @@ class _AuthCardState extends State<AuthCard> {
 
   @override
   Widget build(BuildContext context) {
+    print('build()');
     final deviceSize = MediaQuery.of(context).size;
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: Container(
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
+      child: AnimatedBuilder(
+        animation: _heightAnimation,
+        builder: (context, child) => Container(
+          // height: _authMode == AuthMode.Signup ? 320 : 260,
+          height: _heightAnimation.value.height,
+          constraints: BoxConstraints(minHeight: _heightAnimation.value.height),
+          width: deviceSize.width * 0.75,
+          padding: EdgeInsets.all(16.0),
+          child: child,
+        ),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
