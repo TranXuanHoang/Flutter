@@ -108,7 +108,8 @@ class _AuthCardState extends State<AuthCard>
   var _confirmPassworMatches = false;
 
   AnimationController _controller;
-  Animation<Size> _heightAnimation;
+  Animation<Offset> _slideAnimation;
+  Animation<double> _opacityAnimation;
 
   @override
   void initState() {
@@ -121,13 +122,22 @@ class _AuthCardState extends State<AuthCard>
         milliseconds: 300,
       ),
     );
-    _heightAnimation = Tween<Size>(
-      begin: Size(double.infinity, 260), // size for login
-      end: Size(double.infinity, 320), // size for sign up
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -1.5),
+      end: Offset.zero,
     ).animate(
       CurvedAnimation(
         parent: _controller,
         curve: Curves.linear,
+      ),
+    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn,
       ),
     );
   }
@@ -220,12 +230,12 @@ class _AuthCardState extends State<AuthCard>
         // Change auth mode
         _authMode = AuthMode.Signup;
         _confirmPasswordController.addListener(_confirmPasswordListener);
-        // _controller.forward();
+        _controller.forward();
       } else {
         // Change auth mode
         _authMode = AuthMode.Login;
         _confirmPasswordController.removeListener(_confirmPasswordListener);
-        // _controller.reverse();
+        _controller.reverse();
       }
 
       // Clear input fields
@@ -326,32 +336,46 @@ class _AuthCardState extends State<AuthCard>
                   },
                   onSaved: (newValue) => _authData['password'] = newValue,
                 ),
-                if (_authMode == AuthMode.Signup)
-                  TextFormField(
-                    decoration: InputDecoration(
-                        labelText: 'Confirm Password',
-                        icon: Icon(
-                          Icons.check,
-                          color: _confirmPassworMatches
-                              ? Colors.green
-                              : Colors.white,
-                        )),
-                    obscureText: true,
-                    keyboardType: TextInputType.visiblePassword,
-                    autovalidate: _autovalidateConfirmPassword,
-                    controller: _confirmPasswordController,
-                    focusNode: _confirmPasswordFocusNode,
-                    validator: _authMode == AuthMode.Signup
-                        ? (value) {
-                            if (value.isEmpty) {
-                              return 'Please input your password again.';
-                            }
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match!';
-                            }
-                            return null;
-                          }
-                        : null,
+                // if (_authMode == AuthMode.Signup)
+                  AnimatedContainer(
+                    constraints: BoxConstraints(
+                      minHeight: _authMode == AuthMode.Signup ? 60 : 0,
+                      maxHeight: _authMode == AuthMode.Signup ? 120 : 0,
+                    ),
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeIn,
+                    child: FadeTransition(
+                      opacity: _opacityAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                              labelText: 'Confirm Password',
+                              icon: Icon(
+                                Icons.check,
+                                color: _confirmPassworMatches
+                                    ? Colors.green
+                                    : Colors.white,
+                              )),
+                          obscureText: true,
+                          keyboardType: TextInputType.visiblePassword,
+                          autovalidate: _autovalidateConfirmPassword,
+                          controller: _confirmPasswordController,
+                          focusNode: _confirmPasswordFocusNode,
+                          validator: _authMode == AuthMode.Signup
+                              ? (value) {
+                                  if (value.isEmpty) {
+                                    return 'Please input your password again.';
+                                  }
+                                  if (value != _passwordController.text) {
+                                    return 'Passwords do not match!';
+                                  }
+                                  return null;
+                                }
+                              : null,
+                        ),
+                      ),
+                    ),
                   ),
                 SizedBox(height: 20),
                 if (_isLoading)
