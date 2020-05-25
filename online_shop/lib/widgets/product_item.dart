@@ -24,8 +24,11 @@ class ProductItem extends StatelessWidget {
           );
         },
         child: GridTile(
-          child: Image.network(
-            product.imageUrl,
+          child: FadeInImage(
+            placeholder: AssetImage('assets/images/product-placeholder.png'),
+            image: NetworkImage(
+              product.imageUrl,
+            ),
             fit: BoxFit.cover,
           ),
           footer: GridTileBar(
