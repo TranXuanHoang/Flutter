@@ -1,6 +1,16 @@
 # online_shop
 
-A simple ecommerce online shopping moble application.
+Create a simple online shopping app that provides the following functionalities
+
+* Sign-up, login, logout
+* Also provide auto login when opening the app again, and auto logout when a specific period of time has passed
+* View all products that are being sold
+* Make purchase orders (no payment at this time), and view orders history
+* Add/update/delete products that are being managed by users (each user can only update/delete products that he/she added before)
+* Mark products as favorite and filter out favorite products
+* View product details
+
+The app persists the data in a [Firebase](https://firebase.google.com/) Realtime Database.
 
 ## List of Main Screens
 
