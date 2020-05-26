@@ -41,10 +41,11 @@ class _OrderItemState extends State<OrderItem> {
             ),
             color: _expanded ? Color.fromRGBO(255, 230, 204, 1) : Colors.white10,
           ),
-          if (_expanded)
-            Container(
-              // margin: EdgeInsets.all(15),
-              height: min(120, widget.order.products.length * 75.0),
+          // if (_expanded)
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeIn,
+              height: _expanded ? min(120, widget.order.products.length * 75.0) : 0,
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: ListView.builder(
                 itemBuilder: (context, index) {
