@@ -28,6 +28,10 @@
 	<string>We need to take a picture!</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need to record a video!</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need map to choose the location!</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need map to choose the location!</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
