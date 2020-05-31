@@ -1,16 +1,10 @@
 # great_places
 
-A new Flutter project.
+Create a simple smartphone app that allows users to add great places. The app uses native device features like *camera*, *maps*, *location*, and *local storage SQLite database*. The app also uses an *image picker* to let users select any images taken by the camera, and then saves that image on the *Filesystem* (on the devive), and later on that image is reused to display on the places list and place detail screens.
 
-## Getting Started
+## Snapshots of the App
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+|Add new places using camera and Google Maps |Restart the app without loosing data |
+|---------|---------|
+|![Add new places using camera and Google Maps](./snapshots/1-AddNewPlaces.gif) |![Restart the app without loosing data](./snapshots/2-RestartApp.gif) |
