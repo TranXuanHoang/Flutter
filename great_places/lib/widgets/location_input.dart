@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:great_places/helpers/location_helper.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+
+import '../helpers/location_helper.dart';
+import '../models/place.dart';
+import '../screens/map_screen.dart';
 
 class LocationInput extends StatefulWidget {
   @override
@@ -9,6 +13,7 @@ class LocationInput extends StatefulWidget {
 
 class _LocationInputState extends State<LocationInput> {
   String _previewImageUrl;
+  PlaceLocation currentLocation;
 
   Future<void> _getCurrentUserLocation() async {
     final locData = await Location().getLocation();
@@ -16,6 +21,40 @@ class _LocationInputState extends State<LocationInput> {
         latitude: locData.latitude, longitude: locData.longitude);
     setState(() {
       _previewImageUrl = locationImageUrl;
+      currentLocation = new PlaceLocation(
+        latitude: locData.latitude,
+        longitude: locData.longitude,
+      );
+    });
+  }
+
+  Future<void> _selectOnMap() async {
+    final selectedLocation = await Navigator.of(context).push<LatLng>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => currentLocation != null
+            ? MapScreen(
+                initialLocation: currentLocation,
+                isSelecting: true,
+              )
+            : MapScreen(
+                isSelecting: true,
+              ),
+      ),
+    );
+    if (selectedLocation == null) {
+      return;
+    }
+    // Do something with selected location
+    setState(() {
+      currentLocation = PlaceLocation(
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
+      );
+      _previewImageUrl = LocationHelper.generateLocationPreviewImage(
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
+      );
     });
   }
 
@@ -57,7 +96,7 @@ class _LocationInputState extends State<LocationInput> {
               icon: Icon(Icons.map),
               label: Text('Select on Map'),
               textColor: Theme.of(context).primaryColor,
-              onPressed: () {},
+              onPressed: _selectOnMap,
             ),
           ],
         ),

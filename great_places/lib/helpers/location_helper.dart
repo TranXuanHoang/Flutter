@@ -1,6 +1,28 @@
 /// The key used in calling [Google Maps Static API](https://developers.google.com/maps/documentation/maps-static/intro).
 /// See how to [Get an API Key and Signature](https://developers.google.com/maps/documentation/maps-static/get-api-key)
 /// for more information.
+/// 
+/// This key value is also used in
+/// * [android/app/src/main/AndroidManifest.xml]
+/// ```dart
+/// <manifest ...
+///     <application ...
+///     <meta-data android:name="com.google.android.geo.API_KEY"
+///         android:value="YOUR KEY HERE"/>
+/// ```
+/// * [ios/Runner/AppDelegate.swift]
+/// ```dart
+/// ...
+/// import GoogleMaps
+/// ...
+///     GMSServices.provideAPIKey("YOUR KEY HERE")
+/// ```
+/// 
+/// Note: To allow this key to be used on Android and iOS devices,
+/// we will need to enable the following Google Maps APIs:
+/// * [Maps Static API](https://developers.google.com/maps/documentation/maps-static/intro)
+/// * [Maps SDK for Android](https://developers.google.com/maps/documentation/android-sdk/)
+/// * [Maps SDK for iOS](https://developers.google.com/maps/documentation/ios-sdk/)
 const GOOGLE_API_KEY = 'AIzaSyCghBAvPMF_rASLPubYJte0EOIQF7fTJGM';
 
 class LocationHelper {
