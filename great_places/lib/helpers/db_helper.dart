@@ -39,6 +39,9 @@ class DBHelper {
         Column(name: 'id', isPrimaryKey: true),
         Column(name: 'title'),
         Column(name: 'image'),
+        Column(name: 'loc_lat', dataType: 'REAL'),
+        Column(name: 'loc_lng', dataType: 'REAL'),
+        Column(name: 'address'),
       ],
     ),
   ];

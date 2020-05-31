@@ -7,34 +7,48 @@ import '../models/place.dart';
 import '../screens/map_screen.dart';
 
 class LocationInput extends StatefulWidget {
+  final Function onSelectPlace;
+
+  LocationInput(this.onSelectPlace);
+
   @override
   _LocationInputState createState() => _LocationInputState();
 }
 
 class _LocationInputState extends State<LocationInput> {
   String _previewImageUrl;
-  PlaceLocation currentLocation;
+  PlaceLocation _currentLocation;
 
-  Future<void> _getCurrentUserLocation() async {
-    final locData = await Location().getLocation();
+  void _showPreview(double lat, double lng) {
     final locationImageUrl = LocationHelper.generateLocationPreviewImage(
-        latitude: locData.latitude, longitude: locData.longitude);
+        latitude: lat, longitude: lng);
     setState(() {
       _previewImageUrl = locationImageUrl;
-      currentLocation = new PlaceLocation(
-        latitude: locData.latitude,
-        longitude: locData.longitude,
+      _currentLocation = new PlaceLocation(
+        latitude: lat,
+        longitude: lng,
       );
     });
+  }
+
+  Future<void> _getCurrentUserLocation() async {
+    try {
+      final locData = await Location().getLocation();
+      _showPreview(locData.latitude, locData.longitude);
+      widget.onSelectPlace(_currentLocation);
+    } catch (error) {
+      debugPrint(error);
+      return;
+    }
   }
 
   Future<void> _selectOnMap() async {
     final selectedLocation = await Navigator.of(context).push<LatLng>(
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (context) => currentLocation != null
+        builder: (context) => _currentLocation != null
             ? MapScreen(
-                initialLocation: currentLocation,
+                initialLocation: _currentLocation,
                 isSelecting: true,
               )
             : MapScreen(
@@ -45,17 +59,8 @@ class _LocationInputState extends State<LocationInput> {
     if (selectedLocation == null) {
       return;
     }
-    // Do something with selected location
-    setState(() {
-      currentLocation = PlaceLocation(
-        latitude: selectedLocation.latitude,
-        longitude: selectedLocation.longitude,
-      );
-      _previewImageUrl = LocationHelper.generateLocationPreviewImage(
-        latitude: selectedLocation.latitude,
-        longitude: selectedLocation.longitude,
-      );
-    });
+    _showPreview(selectedLocation.latitude, selectedLocation.longitude);
+    widget.onSelectPlace(_currentLocation);
   }
 
   @override
