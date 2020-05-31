@@ -41,7 +41,7 @@ class CategoryItem extends StatelessWidget {
       child: Container(
         child: Text(
           title,
-          style: Theme.of(context).textTheme.title,
+          style: Theme.of(context).textTheme.headline6,
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
