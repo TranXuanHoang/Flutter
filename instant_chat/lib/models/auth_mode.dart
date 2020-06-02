@@ -1,0 +1,6 @@
+enum AuthMode {
+  SIGNUP,
+  LOGIN,
+  RECOVER_PASSWORD,
+  CHANGE_PASSWORD,
+}

@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../models/auth_mode.dart';
 import '../models/user.dart';
 
-enum AuthMode {
-  SIGNUP,
-  LOGIN,
-  RECOVER_PASSWORD,
-  CHANGE_PASSWORD,
-}
-
 class AuthForm extends StatefulWidget {
+  final void Function(User user, AuthMode authMode) submitFn;
+
+  AuthForm(this.submitFn);
+
   @override
   _AuthFormState createState() => _AuthFormState();
 }
@@ -26,7 +24,7 @@ class _AuthFormState extends State<AuthForm> {
       return;
     }
     _formKey.currentState.save();
-    print(_user);
+    widget.submitFn(_user, _authMode);
   }
 
   void _changeAuthMode(AuthMode newAuthMode) {
