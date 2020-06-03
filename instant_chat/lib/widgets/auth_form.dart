@@ -4,9 +4,14 @@ import '../models/auth_mode.dart';
 import '../models/user.dart';
 
 class AuthForm extends StatefulWidget {
-  final void Function(User user, AuthMode authMode) submitFn;
+  final bool isAuthBeingRun;
+  final void Function(
+    User user,
+    AuthMode authMode,
+    BuildContext context,
+  ) submitFn;
 
-  AuthForm(this.submitFn);
+  AuthForm(this.submitFn, this.isAuthBeingRun);
 
   @override
   _AuthFormState createState() => _AuthFormState();
@@ -24,7 +29,7 @@ class _AuthFormState extends State<AuthForm> {
       return;
     }
     _formKey.currentState.save();
-    widget.submitFn(_user, _authMode);
+    widget.submitFn(_user, _authMode, context);
   }
 
   void _changeAuthMode(AuthMode newAuthMode) {
@@ -140,18 +145,21 @@ class _AuthFormState extends State<AuthForm> {
                       },
                     ),
                     SizedBox(height: 12),
-                    RaisedButton(
-                      child: Text(
-                          _authMode == AuthMode.LOGIN ? 'Login' : 'Sign Up'),
-                      onPressed: _trySubmit,
-                    ),
-                    FlatButton(
-                      child: Text(_authMode == AuthMode.LOGIN
-                          ? 'Create new account'
-                          : 'Login'),
-                      textColor: Theme.of(context).primaryColor,
-                      onPressed: _toggleSignupLogin,
-                    ),
+                    if (widget.isAuthBeingRun) CircularProgressIndicator(),
+                    if (!widget.isAuthBeingRun)
+                      RaisedButton(
+                        child: Text(
+                            _authMode == AuthMode.LOGIN ? 'Login' : 'Sign Up'),
+                        onPressed: _trySubmit,
+                      ),
+                    if (!widget.isAuthBeingRun)
+                      FlatButton(
+                        child: Text(_authMode == AuthMode.LOGIN
+                            ? 'Create new account'
+                            : 'Login'),
+                        textColor: Theme.of(context).primaryColor,
+                        onPressed: _toggleSignupLogin,
+                      ),
                   ],
                 ),
               ),
