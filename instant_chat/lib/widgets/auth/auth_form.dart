@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/auth_mode.dart';
-import '../models/user.dart';
+import '../../models/auth_mode.dart';
+import '../../models/user.dart';
 
 class AuthForm extends StatefulWidget {
   final bool isAuthBeingRun;

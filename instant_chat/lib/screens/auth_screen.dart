@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../models/auth_mode.dart';
 import '../models/user.dart';
-import '../widgets/auth_form.dart';
+import '../widgets/auth/auth_form.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
