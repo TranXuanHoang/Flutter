@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import './screens/auth_screen.dart';
+import './screens/chat_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,7 +30,18 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: AuthScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.onAuthStateChanged,
+        builder: (context, userSnapshot) {
+          if (userSnapshot.hasData) {
+            // userSnapshot.hasData == true means onAuthStateChanged returned
+            // a not null FirebaseUser object - the user token is valid and
+            // the user is in authenticated status
+            return ChatScreen();
+          }
+          return AuthScreen();
+        },
+      ),
     );
   }
 }
