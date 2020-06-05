@@ -32,8 +32,9 @@ class Messages extends StatelessWidget {
               reverse: true,
               itemCount: chatDocs.length,
               itemBuilder: (context, index) => MessageBuble(
-                chatDocs[index]['text'],
-                chatDocs[index]['userId'] == currentUser.uid,
+                message: chatDocs[index]['text'],
+                username: chatDocs[index]['username'],
+                isMe: chatDocs[index]['userId'] == currentUser.uid,
                 // Pass a key to each item element to help the ListView
                 // render and update its elements effectively
                 key: ValueKey(chatDocs[index].documentID),

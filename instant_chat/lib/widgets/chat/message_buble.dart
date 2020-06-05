@@ -6,9 +6,15 @@ class MessageBuble extends StatelessWidget {
   /// more effeciently
   final Key key;
   final String message;
+  final String username;
   final bool isMe;
 
-  MessageBuble(this.message, this.isMe, {this.key});
+  MessageBuble({
+    @required this.message,
+    @required this.username,
+    @required this.isMe,
+    this.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +40,29 @@ class MessageBuble extends StatelessWidget {
             vertical: 4,
             horizontal: 8,
           ),
-          child: Text(
-            message,
-            style: TextStyle(
-              color: isMe
-                  ? Colors.black
-                  : Theme.of(context).accentTextTheme.headline6.color,
-            ),
+          child: Column(
+            crossAxisAlignment:
+                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                username,
+                textAlign: isMe ? TextAlign.right : TextAlign.left,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isMe
+                      ? Colors.black
+                      : Theme.of(context).accentTextTheme.headline6.color,
+                ),
+              ),
+              Text(
+                message,
+                style: TextStyle(
+                  color: isMe
+                      ? Colors.black
+                      : Theme.of(context).accentTextTheme.headline6.color,
+                ),
+              ),
+            ],
           ),
         ),
       ],
