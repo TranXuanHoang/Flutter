@@ -29,11 +29,13 @@ class Messages extends StatelessWidget {
             }
             final chatDocs = snapshot.data.documents as List<DocumentSnapshot>;
             return ListView.builder(
+              padding: EdgeInsets.only(top: 20),
               reverse: true,
               itemCount: chatDocs.length,
               itemBuilder: (context, index) => MessageBuble(
                 message: chatDocs[index]['text'],
                 username: chatDocs[index]['username'],
+                profileImageUrl: chatDocs[index]['profileImageUrl'],
                 isMe: chatDocs[index]['userId'] == currentUser.uid,
                 // Pass a key to each item element to help the ListView
                 // render and update its elements effectively

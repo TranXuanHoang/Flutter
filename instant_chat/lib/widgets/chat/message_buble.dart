@@ -7,11 +7,13 @@ class MessageBuble extends StatelessWidget {
   final Key key;
   final String message;
   final String username;
+  final String profileImageUrl;
   final bool isMe;
 
   MessageBuble({
     @required this.message,
     @required this.username,
+    @required this.profileImageUrl,
     @required this.isMe,
     this.key,
   });
@@ -31,38 +33,59 @@ class MessageBuble extends StatelessWidget {
               bottomRight: !isMe ? Radius.circular(12) : Radius.zero,
             ),
           ),
-          constraints: BoxConstraints(maxWidth: 340),
+          constraints: BoxConstraints(maxWidth: 300),
           padding: EdgeInsets.symmetric(
             vertical: 10,
             horizontal: 16,
           ),
           margin: EdgeInsets.symmetric(
-            vertical: 4,
+            vertical: 18,
             horizontal: 8,
           ),
-          child: Column(
-            crossAxisAlignment:
-                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          child: Stack(
             children: <Widget>[
-              Text(
-                username,
-                textAlign: isMe ? TextAlign.right : TextAlign.left,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: isMe
-                      ? Colors.black
-                      : Theme.of(context).accentTextTheme.headline6.color,
-                ),
+              Column(
+                crossAxisAlignment: isMe
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    username,
+                    textAlign: isMe ? TextAlign.right : TextAlign.left,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isMe
+                          ? Colors.black
+                          : Theme.of(context)
+                              .accentTextTheme
+                              .headline6
+                              .color,
+                    ),
+                  ),
+                  Text(
+                    message,
+                    style: TextStyle(
+                      color: isMe
+                          ? Colors.black
+                          : Theme.of(context)
+                              .accentTextTheme
+                              .headline6
+                              .color,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                message,
-                style: TextStyle(
-                  color: isMe
-                      ? Colors.black
-                      : Theme.of(context).accentTextTheme.headline6.color,
+              Positioned(
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(profileImageUrl),
+                  radius: 25,
                 ),
-              ),
+                top: -40,
+                left: isMe ? -45 : null,
+                right: !isMe ? -45 : null,
+              )
             ],
+            overflow: Overflow.visible,
           ),
         ),
       ],
