@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/auth_mode.dart';
 import '../../models/user.dart';
+import '../pickers/user_image_picker.dart';
 
 class AuthForm extends StatefulWidget {
   final bool isAuthBeingRun;
@@ -63,6 +64,7 @@ class _AuthFormState extends State<AuthForm> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
+                    if (_authMode == AuthMode.SIGNUP) UserImagePicker(),
                     TextFormField(
                       key: ValueKey('email'),
                       keyboardType: TextInputType.emailAddress,
