@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../models/auth_mode.dart';
@@ -23,9 +25,26 @@ class _AuthFormState extends State<AuthForm> {
   var _authMode = AuthMode.LOGIN;
   var _user = User();
 
+  void _userImagePicking(File pickedImage) {
+    _user = _user.copyWith(newProfileImagePath: pickedImage.path);
+  }
+
   void _trySubmit() {
-    final isValid = _formKey.currentState.validate();
     FocusScope.of(context).unfocus(); // Turn of soft keyboard
+    if (_authMode == AuthMode.SIGNUP && _user.profileImagePath == null) {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Please add your profile picture',
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
+      return;
+    }
+
+    final isValid = _formKey.currentState.validate();
     if (!isValid) {
       return;
     }
@@ -64,7 +83,8 @@ class _AuthFormState extends State<AuthForm> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    if (_authMode == AuthMode.SIGNUP) UserImagePicker(),
+                    if (_authMode == AuthMode.SIGNUP)
+                      UserImagePicker(_userImagePicking),
                     TextFormField(
                       key: ValueKey('email'),
                       keyboardType: TextInputType.emailAddress,
@@ -85,11 +105,7 @@ class _AuthFormState extends State<AuthForm> {
                         return null;
                       },
                       onSaved: (newValue) {
-                        _user = User(
-                          email: newValue,
-                          username: _user.username,
-                          password: _user.password,
-                        );
+                        _user = _user.copyWith(newEmail: newValue);
                       },
                     ),
                     if (_authMode == AuthMode.SIGNUP)
@@ -112,11 +128,7 @@ class _AuthFormState extends State<AuthForm> {
                           return null;
                         },
                         onSaved: (newValue) {
-                          _user = User(
-                            email: _user.email,
-                            username: newValue,
-                            password: _user.password,
-                          );
+                          _user = _user.copyWith(newUsername: newValue);
                         },
                       ),
                     TextFormField(
@@ -139,11 +151,7 @@ class _AuthFormState extends State<AuthForm> {
                         return null;
                       },
                       onSaved: (newValue) {
-                        _user = User(
-                          email: _user.email,
-                          username: _user.username,
-                          password: newValue,
-                        );
+                        _user = _user.copyWith(newPassword: newValue);
                       },
                     ),
                     SizedBox(height: 12),

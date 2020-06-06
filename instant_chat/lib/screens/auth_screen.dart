@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart' as path;
 
 import '../models/auth_mode.dart';
 import '../models/user.dart';
@@ -41,15 +45,30 @@ class _AuthScreenState extends State<AuthScreen> {
           email: user.email.trim(),
           password: user.password,
         );
+
+        final profileImage = File(user.profileImagePath);
+        String fileName = path.basename(user.profileImagePath);
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_images')
+            .child(_authResult.user.uid)
+            .child('profile')
+            .child(fileName);
+
+        await ref.putFile(profileImage).onComplete;
+        final url = await ref.getDownloadURL();
+
         await Firestore.instance
             .collection('users')
             .document(_authResult.user.uid)
             .setData({
           'username': user.username,
           'email': user.email,
+          'profileImageUrl': url,
         });
       }
     } on PlatformException catch (error) {
+      _showLoading(false);
       var message =
           'An error occurred. ${authMode == AuthMode.SIGNUP ? 'Signup' : 'Login'} failed.';
 
@@ -65,7 +84,6 @@ class _AuthScreenState extends State<AuthScreen> {
       );
     } catch (error) {
       print(error);
-    } finally {
       _showLoading(false);
     }
   }
