@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "548104720657",
+    "firebase_url": "https://flutter-chat-96cba.firebaseio.com",
+    "project_id": "flutter-chat-96cba",
+    "storage_bucket": "flutter-chat-96cba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548104720657:android:36eac7d5e0e17f67fbfcb0",
+        "android_client_info": {
+          "package_name": "com.hoangtx.instant_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "548104720657-s7d0kuvk5mek4e1hse2t8h1roedd30uh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4iSHobDnZftksG4PDMQcYcIe87Iu_g_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "548104720657-s7d0kuvk5mek4e1hse2t8h1roedd30uh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
