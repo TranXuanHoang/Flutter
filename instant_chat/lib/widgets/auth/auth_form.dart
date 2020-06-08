@@ -112,6 +112,9 @@ class _AuthFormState extends State<AuthForm> {
                       TextFormField(
                         key: ValueKey('username'),
                         keyboardType: TextInputType.text,
+                        autocorrect: false,
+                        enableSuggestions: true,
+                        textCapitalization: TextCapitalization.words,
                         decoration: InputDecoration(
                           labelText: 'Username',
                           icon: Icon(Icons.account_box),
