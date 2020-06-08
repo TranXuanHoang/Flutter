@@ -35,6 +35,19 @@ class _ChatScreenState extends State<ChatScreen> {
         return;
       },
     );
+
+    // Subcribe to a topic (here is the chat room id) to listen to events
+    // and receive chat notifications sent to the chat topic on this device
+    // The topic here will be used in functions/index.js as below
+    // admin.messaging().send({
+    //     topic: `chats_${chatRoomId}`,
+    //     notification: {
+    //         title: message.username,
+    //         body: message.text,
+    //     },
+    //     ...
+    // });
+    _firebaseMessaging.subscribeToTopic('chats_hZ25P0awp3qvsGfTbAdP');
   }
 
   @override
